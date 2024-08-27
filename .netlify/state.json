@@ -1,0 +1,19 @@
+{
+	"geolocation": {
+		"data": {
+			"city": "Hampton",
+			"country": {
+				"code": "US",
+				"name": "United States"
+			},
+			"subdivision": {
+				"code": "VA",
+				"name": "Virginia"
+			},
+			"timezone": "America/New_York",
+			"latitude": 37.0453,
+			"longitude": -76.3404
+		},
+		"timestamp": 1724800779795
+	}
+}

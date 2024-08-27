@@ -1,0 +1,68 @@
+@import './base.css';
+
+#app {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 0rem;
+  font-weight: normal;
+  margin-right: .5rem;
+  margin-left: .5rem;
+  display: grid;
+  grid-template-columns: 2fr 8fr;
+}
+
+a,
+.subheading {
+  text-decoration: none;
+  color: #ffffff70;
+  font-size: 20px;
+  font-weight:600;
+}
+
+.gradient-top {
+  font-weight: bold;
+  background: linear-gradient(to top,
+          #711DB0 0%,
+          #C21292 30%,
+          #EF4040 60%,
+          #FFA732 90%
+          );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+}
+
+.gradient-bottom {
+  font-weight: bold;
+  background: linear-gradient(to bottom,
+          #711DB0 0%,
+          #C21292 30%,
+          #EF4040 60%,
+          #FFA732 90%
+          );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: left;
+}
+
+@media (hover: hover) {
+  a:hover {
+    color: #C21292;
+    font-weight: bold;
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+
+}
+
+.grid-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
