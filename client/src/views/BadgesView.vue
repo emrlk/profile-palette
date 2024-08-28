@@ -19,7 +19,7 @@ export default {
     async mounted() {
         try {
             // Fetch badge details from serverless function
-            const response = await fetch('../netlify/functions/getBadges');
+            const response = await fetch('/.netlify/functions/getBadges');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
