@@ -1,10 +1,9 @@
 <template>
     <div class="badges">
         <div class="grid-container">
-            <!-- Loop through items and display them in the grid -->
             <div class="grid-item" v-for="badge in badges" :key="badge.id">
-                <img :src="badge.imageUrl" :alt="badge.name" />
                 <p>{{ badge.name }}</p>
+                <p>Stages: {{ badge.numOfStages }}</p>
             </div>
         </div>
     </div>
@@ -14,20 +13,26 @@
 export default {
     data() {
         return {
-            badges: []  //Initialize an empty array to store the badges
+            badges: []  // Initialize an empty array to store the badges
         };
     },
     async mounted() {
         try {
-            const response = await fetch('/.netlify/functions/getBadges');
-            const data = await response.json();
-            this.badges = data.badges.map(badge => ({
-                id: badge.badgeid,
+            // Fetch badge details from serverless function
+            const response = await fetch('../netlify/functions/getBadges');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            
+            
+            const badgeDetails = await response.json();
+            this.badges = badgeDetails.map(badge => ({
+                id: badge.badgeId,
                 name: badge.name,
-                imageUrl: badge.image_url //Update based on actual API response
+                numOfStages: badge.numOfStages // Include additional details as needed
             }));
         } catch (error) {
-            console.error('Error fetching badges:', error);
+            console.error('Error fetching badges in BadgesView:', error);
         }
     }
 };
