@@ -1,3 +1,26 @@
-.env
 # Local Netlify folder
 .netlify
+
+# Node modules
+node_modules/
+
+# Build outputs
+dist/
+client/dist/
+
+# Local environment variables
+.env
+
+# Log files
+*.log
+
+
+# IDE or Editor specific files
+.vscode/
+.idea/
+
+# Netlify function dependencies
+/client/netlify/functions/node_modules/
+
+# Miscellaneous
+*.env.local

@@ -1,0 +1,11 @@
+{
+  "name": "profile-palette",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd client && npm install && npm run build",
+    "deploy": "netlify deploy"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  }
+}
