@@ -1,35 +1,47 @@
-const fetch = require('node-fetch');
+const fetch = (...args) =>
+    import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-exports.handler = async (event) => {
-    const apiKey = process.env.ACHSTATS_KEY;
-    const badgeIdsUrl = `https://api.achievementstats.com/badges/?key=${apiKey}`;
+exports.handler = async function (event, context) {
+    const badgeIdsUrl = `https://api.achievementstats.com/badges?key=${process.env.ACHSTATS_KEY}`;
+    let badgeDetails = [];
 
     try {
         // Fetch badge IDs
         const response = await fetch(badgeIdsUrl);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
         const badgeIds = await response.json();
 
-        // Fetch badge details
-        const badgeDetails = await Promise.all(badgeIds.map(async (badgeId) => {
-            const detailUrl = `https://api.achievementstats.com/badges/${badgeId}?key=${apiKey}`;
-            const detailResponse = await fetch(detailUrl);
-            if (!detailResponse.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return detailResponse.json();
-        }));
+        if (!Array.isArray(badgeIds)) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Invalid response format' })
+            };
+        }
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(badgeDetails),
-        };
+        // Fetch details for each badge ID
+        const badgePromises = badgeIds.map(async badgeId => {
+            const url = `https://api.achievementstats.com/badges/${badgeId}?key=${process.env.ACHSTATS_KEY}`;
+            try {
+                const badgeResponse = await fetch(url);
+                return await badgeResponse.json();
+            } catch (error) {
+                console.error('Error fetching badge details:', error);
+                return null; // Or handle error accordingly
+            }
+        });
+
+        badgeDetails = await Promise.all(badgePromises);
+        badgeDetails = badgeDetails.filter(detail => detail !== null); // Remove null entries
+
     } catch (error) {
+        console.error('Error fetching badge IDs:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Error fetching badges' }),
+            body: JSON.stringify({ error: 'Failed to fetch badge IDs or details' })
         };
     }
+
+    return {
+        statusCode: 200,
+        body: JSON.stringify(badgeDetails)
+    };
 };

@@ -1,8 +1,12 @@
 {
   "compilerOptions": {
+    "target": "ES6",             // Targets ECMAScript 2015 (ES6)
+    "module": "commonjs",        // CommonJS module system
+    "baseUrl": ".",              // Base directory for resolving paths
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"]        // Path alias for imports
     }
   },
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],       // Includes all files in the src folder
+  "exclude": ["node_modules", "dist"] // Excludes these directories
 }
