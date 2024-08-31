@@ -1,64 +1,61 @@
+/* eslint-disable no-undef */
+const https = require('https');
 
-const fetch = (...args) =>
-    import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const ACHSTATS_KEY = process.env.ACHSTATS_KEY;
 
-exports.handler = async function (event, context) {
-    const badgeIdsUrl = `https://api.achievementstats.com/badges/?key=${process.env.ACHSTATS_KEY}`;
-    let badgeDetails = [];
+function fetchJson(url) {
+    return new Promise((resolve, reject) => {
+        https.get(url, (resp) => {
+            let data = '';
+            
+            resp.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            resp.on('end', () => {
+                try {
+                    resolve(JSON.parse(data));
+                } catch (e) {
+                    reject(new Error('Error parsing JSON'));
+                }
+            });
+
+        }).on("error", (err) => {
+            reject(err);
+        });
+    });
+}
+
+exports.handler = async function(event, context) {
+    const { limit = 50, offset = 0 } = event.queryStringParameters || {};
 
     try {
-        // Fetch badge IDs
-        const response = await fetch(badgeIdsUrl);
+        const appIdsUrl = `https://api.achievementstats.com/badges/?key=${ACHSTATS_KEY}`;
+        const data = await fetchJson(appIdsUrl);
 
-        if (!response.ok) {
-            const errorText = await response.text(); // Log the response text
-            console.error(`Failed to fetch badge IDs: ${response.status} ${response.statusText} - ${errorText}`);
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ error: `Failed to fetch badge IDs: ${response.status} ${response.statusText}` })
-            };
-        }
+        const appIds = data.appIds;
+        const badgePromises = appIds.slice(offset, offset + limit).map(async appId => {
+            const badgesUrl = `https://api.achievementstats.com/games/${appId}/badges/?key=${ACHSTATS_KEY}`;
+            const badges = await fetchJson(badgesUrl);
 
-        const badgeIds = await response.json();
-
-        if (!Array.isArray(badgeIds)) {
-            console.error('Invalid response format:', badgeIds);
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ error: 'Invalid response format' })
-            };
-        }
-
-        // Fetch details for each badge ID
-        const badgePromises = badgeIds.map(async badgeId => {
-            const url = `https://api.achievementstats.com/badges/${badgeId}/?key=${process.env.ACHSTATS_KEY}`;
-            try {
-                const badgeResponse = await fetch(url);
-                if (!badgeResponse.ok) {
-                    const badgeErrorText = await badgeResponse.text(); // Log the response text
-                    console.error(`Failed to fetch badge ${badgeId}: ${badgeResponse.status} ${badgeResponse.statusText} - ${badgeErrorText}`);
-                    return null;
-                }
-                return await badgeResponse.json();
-            } catch (error) {
-                console.error('Error fetching badge details:', error);
-                return null;
-            }
+            return badges.map(badge => ({
+                appId: appId,
+                image: badge.image,
+            }));
         });
 
-        badgeDetails = await Promise.all(badgePromises);
-        badgeDetails = badgeDetails.filter(detail => detail !== null);
+        const badgeDetails = await Promise.all(badgePromises);
+        const flattenedBadgeDetails = badgeDetails.flat();
 
+        return {
+            statusCode: 200,
+            body: JSON.stringify(flattenedBadgeDetails),
+        };
     } catch (error) {
-        console.error('Error fetching badge IDs:', error);
+        console.error('Error fetching badges:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Failed to fetch badge IDs or details' })
+            body: JSON.stringify({ error: 'Failed to fetch badge details' }),
         };
     }
-
-    return {
-        statusCode: 200,
-        body: JSON.stringify(badgeDetails)
-    };
 };

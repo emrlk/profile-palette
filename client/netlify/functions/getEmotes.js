@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const fetch = require('node-fetch');
 
 exports.handler = async function (event, context) {
