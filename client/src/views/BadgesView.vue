@@ -49,6 +49,16 @@ export default {
                 this.displayedBadges = [...this.displayedBadges, ...newBadges];
                 this.startIndex += this.batchSize; // Update startIndex for next batch
 
+                //Check if page is tall enough to scroll, otherwise
+                // load more badges
+                this.$nextTick(() =>{
+                    if(document.documentElement.scrollHeight <= 
+                        window.innerHeight && this.startIndex <
+                        this.badges.length){
+                            this.loadBadges();
+                        }
+                });
+
             } catch (error) {
                 console.error('Error fetching badges:', error);
             } finally {
