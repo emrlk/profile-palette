@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "build": "cd client && npm install && npm run build",
-    "deploy": "netlify deploy"
+    "deploy": "netlify deploy",
+    "dev": "cd client && netlify dev"
   },
   "dependencies": {
     "node-fetch": "^3.3.2"
