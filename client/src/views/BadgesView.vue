@@ -1,5 +1,6 @@
 <template>
     <div class="badges">
+        <Spinner v-if="loading" />
         <div class="grid-container">
             <div class="grid-item" v-for="(badge, index) in displayedBadges" :key="index">
                 <img :src="badge.image" alt="Badge Image" />
@@ -9,7 +10,12 @@
 </template>
 
 <script>
+import Spinner from '../components/SpinnerItem.vue';
+
 export default {
+    components:{
+        Spinner
+    },
     data() {
         return {
             badges: [],
@@ -57,21 +63,19 @@ export default {
                         this.badges.length){
                             this.loadBadges();
                         }
+                    // Hide spinner after DOM updates
+                    this.loading = false;
                 });
 
             } catch (error) {
                 console.error('Error fetching badges:', error);
+                this.loading = false;
             } finally {
                 this.loading = false;
             }
         },
         handleScroll() {
             const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
-
-            console.log('Scroll Position:', window.scrollY);
-            console.log('Document Height:', document.documentElement.scrollHeight);
-            console.log('Near Bottom:', nearBottom);
-
             if (nearBottom && !this.loading && this.startIndex < this.badges.length) {
                 this.loadBadges();
             }

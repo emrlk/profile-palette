@@ -1,5 +1,6 @@
 <template>
   <div class="backgrounds">
+    <Spinner v-if="loading" />
     <div class="grid-container">
       <!-- Loop through items and display them in the grid -->
       <div class="grid-item" v-for="item in backgrounds" :key="item.id">
@@ -11,7 +12,11 @@
 </template>
 
 <script>
+import Spinner from '../components/SpinnerItem.vue';
 export default {
+  components:{
+        Spinner
+    },
   data() {
     return {
       backgrounds: [

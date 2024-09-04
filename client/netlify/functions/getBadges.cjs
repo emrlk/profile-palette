@@ -27,7 +27,7 @@ function fetchJson(url) {
 }
 
 exports.handler = async function(event, context) {
-    const { limit = 50, offset = 0 } = event.queryStringParameters || {};
+    const { limit = 75, offset = 0 } = event.queryStringParameters || {};
 
     try {
         const appIdsUrl = `https://api.achievementstats.com/badges/?key=${ACHSTATS_KEY}`;
@@ -58,4 +58,4 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({ error: 'Failed to fetch badge details' }),
         };
     }
-};
+}; 
